@@ -1,0 +1,13 @@
+name: arangodb
+summary: ArangoDB is a native multi-model, open-source database with flexible
+   data models for documents, graphs, and key-values.
+maintainer: Dixan Peña Peña <dixan.pena@tengu.io>
+description: |
+   ArangoDB is a native multi-model, open-source database with flexible
+   data models for documents, graphs, and key-values.
+tags:
+  - database
+subordinate: false
+provides:
+  website:
+    interface: http
