@@ -15,7 +15,7 @@ options:
     default: "install"
     type: string
     description: |
-      the status of service-affecting packages will be set to this
+      The status of service-affecting packages will be set to this
       value in the dpkg database. valid values are "install" and "hold".
   install_sources:
     description: |
