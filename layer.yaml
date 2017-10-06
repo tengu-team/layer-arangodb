@@ -1,7 +1,7 @@
-includes: ['layer:basic', 'layer:apt'] 
+includes: ['layer:basic', 'layer:apt', 'interface:http'] 
 options:
   apt:
     packages:
       - apt-transport-https
       - arangodb3
-repo: git@github.com:tengu-team/layer-kapacitor.git
+repo: git@github.com:tengu-team/layer-arangodb.git
