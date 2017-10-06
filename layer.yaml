@@ -1,0 +1,7 @@
+includes: ['layer:basic', 'layer:apt']  # if you use any interfaces, add them here
+options:
+  apt:
+    packages:
+      - apt-transport-https
+      - arangodb3
+repo: git@github.com:tengu-team/layer-kapacitor.git
