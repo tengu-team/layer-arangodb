@@ -3,7 +3,12 @@ options:
     type: int
     default: 8529
     description: |
-      ArangoDB web UI port
+      ArangoDB web UI port.
+  root_password:
+    type: string
+    default: "root"
+    description: |
+      To be filled.
   authentication:
     type: boolean
     default: True
@@ -15,7 +20,7 @@ options:
     default: "install"
     type: string
     description: |
-      The status of service-affecting packages will be set to this
+      the status of service-affecting packages will be set to this
       value in the dpkg database. valid values are "install" and "hold".
   install_sources:
     description: |
