@@ -1,4 +1,4 @@
-mport os
+import os
 import subprocess
 from base64 import b64encode
 from charmhelpers.core import unitdata
