@@ -58,7 +58,7 @@ def change_configuration():
                    'authentication': str(authn).lower()
                })
         if old_port is not None:
-           close_port(old_port)
+            close_port(old_port)
         open_port(port)
     if conf['root_password'] != kv.get('password') and conf['root_password'] != "root":
         password = conf['root_password']
