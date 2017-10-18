@@ -17,7 +17,7 @@ def configure_arangodb():
     port = conf['port']
     authn = conf['authentication']
     password =conf['root_password']
-    if password == "root" or "":
+    if password == "":
         password = b64encode(os.urandom(18)).decode('utf-8')
     kv.set('password', password)
     render(source='arangod.conf',
@@ -60,7 +60,7 @@ def change_configuration():
         if old_port is not None:
             close_port(old_port)
         open_port(port)
-    if conf['root_password'] != kv.get('password') and conf['root_password'] != "root":
+    if conf['root_password'] != kv.get('password') and conf['root_password'] != "":
         password = conf['root_password']
         old_password = kv.get('password')
         kv.set('password', password)
