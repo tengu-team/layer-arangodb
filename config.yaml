@@ -6,9 +6,14 @@ options:
       ArangoDB web UI port.
   root_password:
     type: string
-    default: "root"
+    default: ""
     description: |
-      To be filled.
+      Root password is empty by default. During the installation of the charm
+      the user may choose a new password. If this action is not carried out,
+      then a new password will be automatically generated. When the charm has
+      been installed the user may change the root password. We recommend
+      to select a secure and robust password (please avoid passwords such as
+      "root" or an empty string).
   authentication:
     type: boolean
     default: True
