@@ -5,7 +5,7 @@ from charmhelpers.core import unitdata
 from charmhelpers.core.templating import render
 from charmhelpers.core.host import service_restart
 from charms.reactive import when, when_not, set_state
-from charmhelpers.core.hookenv import status_set, open_port, close_port, config
+from charmhelpers.core.hookenv import status_set, open_port, close_port, config, unit_public_ip
 
 kv = unitdata.kv()
 
@@ -26,7 +26,7 @@ def configure_arangodb():
                'port': str(port),
                'authentication': str(authn).lower()
            })
-    require = 'require("@arangodb/users").update("root", "{}", true)'.format(password)
+    require = "require('@arangodb/users').update('root', '{}', true)".format(password)
     subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
     open_port(port)
     set_state('arangodb.configured')
@@ -64,7 +64,8 @@ def change_configuration():
         password = conf['root_password']
         old_password = kv.get('password')
         kv.set('password', password)
-        require = 'require("@arangodb/users").update("root", "{}", true)'.format(password)
-        subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', old_password, '--javascript.execute-string', require])
+        TCP = 'tcp://' + unit_public_ip() + ':' + str(port)
+        require = "require('@arangodb/users').update('root', '{}', true)".format(password)
+        subprocess.check_call(['arangosh', '--server.endpoint', TCP, '--server.username', 'root', '--server.password', old_password, '--javascript.execute-string', require])
     service_restart("arangodb3")
     status_set('active', 'ArangoDB running with admin password {}'.format(kv.get('password')))
