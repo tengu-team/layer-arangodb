@@ -25,12 +25,12 @@ options:
     default: "install"
     type: string
     description: |
-      the status of service-affecting packages will be set to this
-      value in the dpkg database. valid values are "install" and "hold".
+      The status of service-affecting packages will be set to this
+      value in the dpkg database. Valid values are "install" and "hold".
   install_sources:
     description: |
-      list of extra apt sources, per charm-helpers standard
-      format (a yaml list of strings encoded as a string). each source
+      List of extra apt sources, per charm-helpers standard
+      format (a yaml list of strings encoded as a string). Each source
       may be either a line that can be added directly to
       sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
       personal package archives, or a distribution component to enable.
@@ -39,12 +39,12 @@ options:
       -  'deb https://download.arangodb.com/arangodb32/xUbuntu_16.04/ /'
   install_keys:
     description: |
-      list of signing keys for install_sources package sources, per
+      List of signing keys for install_sources package sources, per
       charmhelpers standard format (a yaml list of strings encoded as
-      a string). the keys should be the full ascii armoured gpg public
-      keys. while gpg key ids are also supported and looked up on a
+      a string). The keys should be the full ascii armoured gpg public
+      keys. gpg key ids are also supported and looked up on a
       keyserver, operators should be aware that this mechanism is
-      insecure. null can be used if a standard package signing key is
+      insecure. Null can be used if a standard package signing key is
       used that will already be installed on the machine, and for ppa
       sources where the package signing key is securely retrieved from
       launchpad.
