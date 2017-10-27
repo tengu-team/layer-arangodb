@@ -8,12 +8,12 @@ options:
     type: string
     default: ""
     description: |
-      Root password is empty by default. During the installation of the charm
-      the user may choose a new password. If this action is not carried out,
-      then a new password will be automatically generated. When the charm has
-      been installed the user may change the root password. We recommend
-      to select a secure and robust password (please avoid passwords such as
-      "root" or an empty string).
+      Administrator password is empty by default (username root). During the
+      installation of the charm the user may choose a new password. If this
+      action is not carried out, then a new password will be automatically
+      generated. When the charm has been installed the user may change the
+      admin password. We recommend to select a secure and robust password
+      (please avoid passwords such as "root" or an empty string).
   authentication:
     type: boolean
     default: True
@@ -33,7 +33,7 @@ options:
       format (a yaml list of strings encoded as a string). Each source
       may be either a line that can be added directly to
       sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
-      personal package archives, or a distribution component to enable.
+      Personal Package Archives, or a distribution component to enable.
     type: string
     default: |
       -  'deb https://download.arangodb.com/arangodb32/xUbuntu_16.04/ /'
@@ -41,13 +41,13 @@ options:
     description: |
       List of signing keys for install_sources package sources, per
       charmhelpers standard format (a yaml list of strings encoded as
-      a string). The keys should be the full ascii armoured gpg public
-      keys. gpg key ids are also supported and looked up on a
+      a string). The keys should be the full ASCII armoured GPG public
+      keys. While GPG key ids are also supported and looked up on a
       keyserver, operators should be aware that this mechanism is
       insecure. Null can be used if a standard package signing key is
       used that will already be installed on the machine, and for ppa
       sources where the package signing key is securely retrieved from
-      launchpad.
+      Launchpad.
     type: string
     default: |-
       - |
