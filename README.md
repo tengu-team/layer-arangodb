@@ -19,7 +19,7 @@ Expose the ArangoDB charm:
 juju expose arangodb
 ```
 
-#Contact Information
+# Contact Information
 
 ## Bugs
 
