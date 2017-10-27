@@ -5,7 +5,7 @@ data models for documents, graphs, and key-values.
 
 This charm installs and configures [ArangoDB] (https://arangodb.com/).
 
-#Usage
+# Usage
 
 Deploy the ArangoDB charm with the following:
 
@@ -25,6 +25,6 @@ juju expose arangodb
 
 Report bugs in the [layer-arangodb GitHub repo] (https://github.com/tengu-team/layer-arangodb/issues).
 
-##Authors
+## Authors
 
  - Dixan Peña Peña <dixan.pena@tengu.io>
