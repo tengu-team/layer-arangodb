@@ -11,7 +11,7 @@ Deploy the ArangoDB charm with the following:
 ```bash
 juju deploy cs:~tengu-team/arangodb-0
 ```
-The Arangodb UI is then available at `http://x.x.x.x:8592`
+The Arangodb UI is then available at `http://x.x.x.x:8592`. If the root password is not provided in the `config.yaml`, then the root password will be auto-generated and will be shown in the status of the charm.
 
 # Limitations
 - At this moment ArangoDB can only run in stand-alone mode. Clustering ArangoDB with this charm is still in progress.
