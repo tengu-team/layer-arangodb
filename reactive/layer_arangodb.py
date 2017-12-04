@@ -51,7 +51,7 @@ def configure_arangodb():
 @when_not('arangodb.running')
 def start_arangodb():
     service_restart("arangodb3")
-    status_set('active', 'ArangoDB running with admin password {}'.format(kv.get('password')))
+    status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
     set_state('arangodb.running')
 
 @when('arangodb.running', 'http.available')
@@ -84,4 +84,4 @@ def change_configuration():
         require = "require('@arangodb/users').update('root', '{}', true)".format(password)
         subprocess.check_call(['arangosh', '--server.endpoint', TCP, '--server.username', 'root', '--server.password', old_password, '--javascript.execute-string', require])
     service_restart("arangodb3")
-    status_set('active', 'ArangoDB running with admin password {}'.format(kv.get('password')))
+    status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
