@@ -1,6 +1,5 @@
 name: arangodb
-summary: ArangoDB is a native multi-model, open-source database with flexible
-   data models for documents, graphs, and key-values.
+summary: This charm will Install ArangoDB in stand-alone mode.
 maintainer: Dixan Peña Peña <dixan.pena@tengu.io>
 description: |
    ArangoDB is a native multi-model, open-source database with flexible
