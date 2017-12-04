@@ -9,20 +9,11 @@ configures [ArangoDB](https://arangodb.com/).
 Deploy the ArangoDB charm with the following:
 
 ```bash
-juju deploy cs:~tengu-team/arangodb
-```
-
-Expose the ArangoDB charm:
-
-```bash
-juju expose arangodb
+juju deploy cs:~tengu-team/arangodb-0
 ```
 
 # Contact Information
 
-## Bugs
-
-Report bugs in the [layer-arangodb GitHub repo](https://github.com/tengu-team/layer-arangodb/issues).
 
 ## Authors
 
