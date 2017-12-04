@@ -15,6 +15,7 @@ The ArangoDB UI is then available at `http://x.x.x.x:8592`. If the root password
 
 # Limitations
 - At this moment ArangoDB can only run in stand-alone mode. Clustering ArangoDB with this charm is still in progress.
+- The charm currently provides a http interface but will provide a custom interface which will also provide the root password.
 
 # Contact Information
 
