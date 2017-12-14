@@ -1,4 +1,4 @@
-includes: ['layer:basic', 'layer:apt', 'interface:http'] 
+includes: ['layer:basic', 'layer:leadership', 'layer:metrics', 'layer:apt', 'interface:http'] 
 options:
   apt:
     packages:

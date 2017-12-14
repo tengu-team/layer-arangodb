@@ -8,6 +8,9 @@ tags:
   - database
 subordinate: false
 provides:
-  website:
-    interface: http
+  db:
+    interface: arangodb
+peers:
+  cluster:
+    interface: arangodb
 series: ['xenial']

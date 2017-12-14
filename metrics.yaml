@@ -1,0 +1,6 @@
+metrics:
+  cores:
+    type: gauge
+    description: count machine cores
+    command: lscpu | grep 'CPU(s):' | sed -n 1p | awk '{print $NF}'
+  juju-units: {}
