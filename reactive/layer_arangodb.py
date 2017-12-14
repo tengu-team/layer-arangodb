@@ -139,7 +139,7 @@ def install_standalone():
                'port': str(conf['port']),
                'authentication': str(conf['authentication']).lower()
            })
-    if password == "" and not leader_get()['password']:
+    if password == "" and not leader_get().get('password', None):
         password = b64encode(os.urandom(18)).decode('utf-8')
         require = "require('@arangodb/users').update('root', '{}', true)".format(password)
         subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
