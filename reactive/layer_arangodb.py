@@ -22,10 +22,8 @@ from charms import leadership
 from charms.reactive import when, when_not, set_flag, is_flag_set
 from charmhelpers.core import unitdata
 from charmhelpers.core.templating import render
-from charmhelpers.core.host import service_restart, service_stop
+from charmhelpers.core.host import service_restart, service_stop, service_start
 from charmhelpers.core.hookenv import status_set, open_port, close_port, config, unit_public_ip, leader_get, leader_set, unit_private_ip
-
-
 
 kv = unitdata.kv()
 ################################################################################
@@ -40,7 +38,7 @@ def configure_arangodb():
     set_flag('arangodb.installed')
 
 @when('arangodb.installed', 'db.available')
-def configure_http(db):
+def configure_interface(db):
     conf = config()
     db.configure(conf['port'], kv.get('username'), kv.get('password'))
 
@@ -62,7 +60,7 @@ def set_secrets():
     password = config()['root_password']
     if  password == '':
         password = b64encode(os.urandom(18)).decode('utf-8')
-    leader_set({'password': password, 'master_ip': unit_private_ip()})
+    leader_set({'password': password, 'master_ip': unit_private_ip(), 'master_started': False})
     kv.set('password', password)
     set_flag('secrets.configured')
 
@@ -80,7 +78,7 @@ def configure_cluster(cluster):
     units = cluster.get_peer_addresses()
     install_cluster(units, True)
 
-@when('cluster.depaterd')
+@when('cluster.departed')
 def change_cluster(cluster):
     units = cluster.get_peer_addresses()
     install_cluster(units)
@@ -109,7 +107,6 @@ def change_config(conf):
 
 
 def install_cluster(units, expanded=False):
-    print(units, len(units))
     if len(units) == 0:
         service_restart('arangodb')
     elif expanded:
@@ -119,13 +116,13 @@ def install_cluster(units, expanded=False):
                     status_set('blocked', 'Arangodb needs at least three units to run in cluster mode!')
                     service_stop('arangodb')
         elif len(units) == 2:
-            install_clustered(units)
+            install_clustered()
         else:
             upgrade_cluster(units)
     else:
         if len(units) == 1:
             status_set('blocked', 'Arangodb needs at least three units to run in cluster mode!')
-            subprocess.check_call(['arangodb', 'stop'])
+            service_stop('arangodbcluster')
         else:
             remove_cluster_node(units)
 
@@ -143,25 +140,44 @@ def install_standalone():
     subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
     open_port(conf['port'])
     service_restart('arangodb')
+    status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
 
 
-def install_clustered(units):
+def install_clustered():
     service_stop('arangodb')
     if not is_flag_set('arangodb.clustered'):
         if unit_private_ip() == leader_get('master_ip'):
-            subprocess.check_call(['arangodb', 'start'])
-            status_set('active', '[MASTER] ArangoDB running in Cluster mode')
-        else:
-            #subprocess.check_call(['arangodb', 'start', '--starter.join', leader_get('master_ip')])
-            subprocess.Popen(['arangodb', '--starter.join', leader_get('master_ip')])
+            render(source='arangodbcluster.service',
+                   target='/etc/systemd/system/arangodbcluster.service',
+                   context={'option': ''})
+            subprocess.check_call(['systemctl', 'daemon-reload'])
+            subprocess.check_call(['systemctl', 'enable', 'arangodbcluster.service'])
+            leader_set({'master_started': True})
+            service_start('arangodbcluster')
+            set_flag('arangodb.clustered')
             status_set('active', 'ArangoDB running in Cluster mode')
-    set_flag('arangodb.clusterd')
+        elif leader_get('master_started'):
+            render(source='arangodbcluster.service',
+                   target='/etc/systemd/system/arangodbcluster.service',
+                   context={'option': '--starter.join {}'.format(leader_get('master_ip'))})
+            subprocess.check_call(['systemctl', 'daemon-reload'])
+            subprocess.check_call(['systemctl', 'enable', 'arangodbcluster.service'])
+            service_start('arangodbcluster')
+            set_flag('arangodb.clustered')
+            status_set('active', 'ArangoDB running in Cluster mode')
+
 
 def upgrade_cluster(units):
     if not unit_private_ip() in units:
         service_stop('arangodb')
-        subprocess.Popen(['arangodb', '--starter.join', random.choice(units)])
+        render(source='arangodbcluster.service',
+               target='/etc/systemd/system/arangodbcluster.service',
+               context={'option': '--starter.join {}'.format(random.choice(units))})
+        subprocess.check_call(['systemctl', 'daemon-reload'])
+        subprocess.check_call(['systemctl', 'enable', 'arangodbcluster.service'])
+        service_start('arangodbcluster')
         status_set('active', 'ArangoDB running in Cluster mode')
+        set_flag('arangodb.clustered')
 
 def remove_cluster_node(units):
     if not leader_get('master_ip') in units:

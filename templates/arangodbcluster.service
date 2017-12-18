@@ -1,0 +1,5 @@
+[Unit]
+Description=Arangodb Cluster
+
+[Service]
+ExecStart=/usr/bin/arangodb {{option}}
