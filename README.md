@@ -13,8 +13,18 @@ juju deploy cs:~tengu-team/arangodb-1
 ```
 The ArangoDB UI is then available at `http://x.x.x.x:8592`. If the root password is not provided in the `config.yaml`, then the root password will be auto-generated and will be shown in the status of the charm.
 
-# Contact Information
 
+# Clustering
+The ArangoDB charm supports clustering but will need at least 3 units to work in cluster mode. This charm uses the default configuration for cluster where every unit will act as DB server and Coordinator.
+
+#### 2 units
+If a model contains 2 units then there are two possible situations on how the charms will behave.
+
+1) If a unit was added and the model upgraded from 1 to 2 units, then the first unit that was created will be available in standalone mode while the second unit will get in a blocked state.
+
+2) If a unit was removed while ArangoDB was running in cluster mode, Then both of the units will get in a blocked state.
+
+# Contact Information
 
 ## Authors
 
