@@ -19,7 +19,7 @@ import subprocess
 import random
 from base64 import b64encode
 from charms import leadership
-from charms.reactive import when, when_not, set_state
+from charms.reactive import when, when_not, set_flag, is_flag_set
 from charmhelpers.core import unitdata
 from charmhelpers.core.templating import render
 from charmhelpers.core.host import service_restart, service_stop
@@ -31,13 +31,13 @@ kv = unitdata.kv()
 ################################################################################
 # Install
 ################################################################################
-@when('apt.installed.arangodb3')
+@when('apt.installed.arangodb3', 'secrets.configured')
 @when_not('arangodb.installed')
 def configure_arangodb():
     status_set('maintenance', 'configuring ArangoDB')
     install_standalone()
     status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
-    set_state('arangodb.installed')
+    set_flag('arangodb.installed')
 
 @when('arangodb.installed', 'db.available')
 def configure_http(db):
@@ -59,21 +59,23 @@ def change_configuration():
 @when('leadership.is_leader')
 @when_not('secrets.configured')
 def set_secrets():
-    password = leader_get().get('password', kv.get('password'))
-    leader_set({'password': password, 'first_ip': unit_private_ip()})
+    password = config()['root_password']
+    if  password == '':
+        password = b64encode(os.urandom(18)).decode('utf-8')
+    leader_set({'password': password, 'master_ip': unit_private_ip()})
     kv.set('password', password)
-    set_state('secrets.configured')
+    set_flag('secrets.configured')
 
 
-@when('arangodb.installed')
-@when_not('leadership.is_leader')
+@when_not('leadership.is_leader', 'secrets.configured')
 def set_secrets_local():
     kv.set('password', leader_get()['password'])
     status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
+    set_flag('secrets.configured')
 ################################################################################
 # clustering
 ################################################################################
-@when('cluster.joined')
+@when('cluster.connected')
 def configure_cluster(cluster):
     units = cluster.get_peer_addresses()
     install_cluster(units, True)
@@ -107,23 +109,22 @@ def change_config(conf):
 
 
 def install_cluster(units, expanded=False):
-    kv.set('cluster', units)
-    if len(units) == 1:
-        install_standalone()
+    print(units, len(units))
+    if len(units) == 0:
+        service_restart('arangodb')
     elif expanded:
-        if len(units) == 2:
+        if len(units) == 1:
             for unit in units:
-                if unit == leader_get('master_ip'):
-                    install_standalone()
-                else:
-                    status_set('blocked', 'Arangodb needs at least three units to run in clustering mode!')
-        elif len(units) == 3:
+                if unit_private_ip() != leader_get('master_ip'):
+                    status_set('blocked', 'Arangodb needs at least three units to run in cluster mode!')
+                    service_stop('arangodb')
+        elif len(units) == 2:
             install_clustered(units)
         else:
             upgrade_cluster(units)
     else:
-        if len(units) == 2:
-            status_set('blocked', 'Arangodb needs at least three units to run in clustering mode!')
+        if len(units) == 1:
+            status_set('blocked', 'Arangodb needs at least three units to run in cluster mode!')
             subprocess.check_call(['arangodb', 'stop'])
         else:
             remove_cluster_node(units)
@@ -131,7 +132,6 @@ def install_cluster(units, expanded=False):
 
 def install_standalone():
     conf = config()
-    password = conf['root_password']
     kv.set('username', 'root')
     render(source='arangod.conf',
            target='/etc/arangodb3/arangod.conf',
@@ -139,32 +139,30 @@ def install_standalone():
                'port': str(conf['port']),
                'authentication': str(conf['authentication']).lower()
            })
-    if password == "" and not leader_get().get('password', None):
-        password = b64encode(os.urandom(18)).decode('utf-8')
-        require = "require('@arangodb/users').update('root', '{}', true)".format(password)
-        subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
-    else:
-        password = leader_get()['password']
-    kv.set('password', password)
+    require = "require('@arangodb/users').update('root', '{}', true)".format(kv.get('password'))
+    subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
     open_port(conf['port'])
     service_restart('arangodb')
 
 
 def install_clustered(units):
     service_stop('arangodb')
-    for unit in units:
-        if unit == leader_get('master_ip'):
+    if not is_flag_set('arangodb.clustered'):
+        if unit_private_ip() == leader_get('master_ip'):
             subprocess.check_call(['arangodb', 'start'])
+            status_set('active', '[MASTER] ArangoDB running in Cluster mode')
         else:
-            subprocess.check_call(['arangodb', 'start', '--starter.join', leader_get('master_ip')])
+            #subprocess.check_call(['arangodb', 'start', '--starter.join', leader_get('master_ip')])
+            subprocess.Popen(['arangodb', '--starter.join', leader_get('master_ip')])
+            status_set('active', 'ArangoDB running in Cluster mode')
+    set_flag('arangodb.clusterd')
 
 def upgrade_cluster(units):
-    service_stop('arangodb')
-    rest = units.remove(unit_private_ip())
-    subprocess.check_call(['arangodb', 'start', '--starter.join', random.choice(rest)])
+    if not unit_private_ip() in units:
+        service_stop('arangodb')
+        subprocess.Popen(['arangodb', '--starter.join', random.choice(units)])
+        status_set('active', 'ArangoDB running in Cluster mode')
 
 def remove_cluster_node(units):
-    if not unit_private_ip() in units:
-        subprocess.check_call(['arangodb', 'stop'])
     if not leader_get('master_ip') in units:
         leader_set({'master_ip': random.choice(units)})
