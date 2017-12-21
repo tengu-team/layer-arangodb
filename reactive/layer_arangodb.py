@@ -19,6 +19,7 @@ import subprocess
 import json
 from base64 import b64encode
 from pathlib import Path
+import time
 import requests
 from charms import leadership
 from charms.reactive import when, when_not, set_flag, is_flag_set
@@ -51,8 +52,7 @@ def configure_interface(db):
 @when('arangodb.installed', 'config.changed')
 def change_configuration():
     status_set('maintenance', 'configuring ArangoDB')
-    conf = config()
-    change_config(conf)
+    change_config()
     service_restart('arangodb')
     status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
 
@@ -85,7 +85,8 @@ def configure_cluster(cluster):
 ################################################################################
 # Helper Functions
 ################################################################################
-def change_config(conf):
+def change_config():
+    conf = config()
     if conf.changed('port') or conf.changed('authentication'):
         old_port = conf.previous('port')
         render(source='arangod.conf',
@@ -115,10 +116,10 @@ def install_cluster(units):
         else:
             status_set('blocked', 'Arangodb needs at least three units to run in cluster mode!')
             remove_cluster_node(units)
-    elif len(units) == 2:
-        install_clustered()
     else:
-        upgrade_cluster(units)
+        install_clustered()
+        status_set('active', 'ArangoDB running in Cluster mode')
+        kv.set('cluster', True)
 
 def install_standalone():
     conf = config()
@@ -149,8 +150,6 @@ def install_clustered():
             service_start('arangodbcluster')
             set_flag('arangodb.clustered')
             leader_set({'master_started': True})
-            status_set('active', 'ArangoDB running in Cluster mode')
-            kv.set('cluster', True)
         elif leader_get('master_started'):
             render(source='arangodbcluster.service',
                    target='/etc/systemd/system/arangodbcluster.service',
@@ -158,29 +157,14 @@ def install_clustered():
             subprocess.check_call(['systemctl', 'daemon-reload'])
             subprocess.check_call(['systemctl', 'enable', 'arangodbcluster.service'])
             service_start('arangodbcluster')
+            #let the charm sleep for 15 seconds so that the setup file is created
+            time.sleep(15)
             set_flag('arangodb.clustered')
-            setup_file = Path('{}/setup.json'.format(DATA_DIR))
-            if setup_file.exists():
-                close_port(kv.get('port'))
-                open_coordinater_port()
-
-            status_set('active', 'ArangoDB running in Cluster mode')
-            kv.set('cluster', True)
-
-
-def upgrade_cluster(units):
-    if not unit_private_ip() in units:
-        service_stop('arangodb')
-        render(source='arangodbcluster.service',
-               target='/etc/systemd/system/arangodbcluster.service',
-               context={'option': '--starter.join {}'.format(leader_get('master_ip'))})
-        subprocess.check_call(['systemctl', 'daemon-reload'])
-        subprocess.check_call(['systemctl', 'enable', 'arangodbcluster.service'])
-        service_start('arangodbcluster')
+    setup_file = Path('{}/setup.json'.format(DATA_DIR))
+    if setup_file.exists():
         close_port(kv.get('port'))
         open_coordinater_port()
-        status_set('active', 'ArangoDB running in Cluster mode')
-        set_flag('arangodb.clustered')
+
 
 def remove_cluster_node(units):
     if not leader_get('master_ip') in units and is_flag_set('leadership.is_leader'):
@@ -195,8 +179,7 @@ def retrieve_helper_port():
 
 def open_coordinater_port():
     helper_port = retrieve_helper_port()
-    res = requests.get('http://127.0.0.1:{}/endpoints'.format(helper_port))
-    for ip_adr in res.json()['coordinators']:
-        if ip_adr.startswith('http://{}'.format(unit_private_ip())):
-            if int(ip_adr.split(':')[-1]) > helper_port:
-                open_port(int(ip_adr.split(':')[-1]))
+    res = requests.get('http://127.0.0.1:{}/process'.format(helper_port))
+    for ip_adr in res.json()['servers']:
+        if ip_adr['ip'] == unit_private_ip() and ip_adr['type'] == 'coordinator':
+            open_port(ip_adr['port'])
