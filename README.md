@@ -24,6 +24,10 @@ If a model contains 2 units then there are two possible situations on how the ch
 
 2) If a unit was removed while ArangoDB was running in cluster mode, Then both of the units will get in a blocked state.
 
+# Limitations
+- When a unit is removed in cluster mode, The UI will still show this node in his cluster but with an exclamation mark next to it. The User can then choose to remove it from the list.
+
+
 # Contact Information
 
 ## Authors

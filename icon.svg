@@ -19,6 +19,18 @@
   <defs
      id="defs6519">
     <linearGradient
+       inkscape:collect="always"
+       id="linearGradient6086-3-6">
+      <stop
+         style="stop-color:#a3b34f;stop-opacity:1;"
+         offset="0"
+         id="stop6102" />
+      <stop
+         style="stop-color:#a3b34f;stop-opacity:0;"
+         offset="1"
+         id="stop6104" />
+    </linearGradient>
+    <linearGradient
        id="Background">
       <stop
          id="stop4178"
@@ -121,6 +133,15 @@
     <path
        d="M88.4 29.6c.6.6 1.1 1.2 1.5 2 1.4 2.5 1.8 6.8 2 8.7.1 3.5-.7 8.9-1.6 9.9-.7.4-4.4 5.6-6.9 7.1-.7.4-1.7.5-2.8.9-1.8.7-3 1.5-6.1 1.3-9.4-.7-18.5-5.4-25.7-8-2.7 4.8-12.8 10-12.8 10s-3.4.9-5 1.3c-.9.2-3.1.4-4.6.4-.8 0-1.6-.5-2.4-.4-.7.1-1.4.6-2 .7-2.9.1-8.3-2.2-8.3-2.2l-4.1-3-2.4-2.4s-3.3-3.4-4.6-6.5c-.4-1-1.4-2.1-1.7-3-.4-1-.4-2.9-.7-4.1-1.1-5.5.5-9.7 3.7-13.3 2.6-1.4 4.3-3 7.4-4.3 4.5-1.9 8.7-5.6 14.8-5.9.9-3.7 2.5-5.3 4.6-7.5 1.8-1.9 4.3-4.1 6.5-5.7 4.3-3.3 11.7-5.6 17.9-5.6 4.5 0 7.6 1.2 11 2.6 3.1 1.2 5.8 2.9 8.4 4.4 0 0 5 2.9 7.4 9.8.6 1.7 4 5.1 4.8 7.1 0 0 .6 1.3.8 2.7.2 1.4.5 2.5.9 3z"
        id="a" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6086-3-6"
+       id="linearGradient6092"
+       x1="-268"
+       y1="683.29077"
+       x2="-172"
+       y2="683.29077"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -130,7 +151,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.0745362"
-     inkscape:cx="-13.924743"
+     inkscape:cx="42.422208"
      inkscape:cy="49.018169"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -139,10 +160,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1536"
-     inkscape:window-height="801"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1301"
+     inkscape:window-height="744"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
      showborder="true"
      showguides="true"
@@ -157,7 +178,7 @@
        id="guide823" />
     <sodipodi:guide
        orientation="0,1"
-       position="64,80"
+       position="5,95"
        id="guide825" />
     <sodipodi:guide
        orientation="1,0"
@@ -187,7 +208,7 @@
      transform="translate(268,-635.29076)"
      style="display:inline">
     <path
-       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter1121)"
+       style="display:inline;fill:url(#linearGradient6092);fill-opacity:1.0;stroke:none;opacity:1"
        d="m -268,700.15563 0,-33.72973 c 0,-27.24324 3.88785,-31.13513 31.10302,-31.13513 l 33.79408,0 c 27.21507,0 31.1029,3.89189 31.1029,31.13513 l 0,33.72973 c 0,27.24325 -3.88783,31.13514 -31.1029,31.13514 l -33.79408,0 c -27.21517,0 -31.10302,-3.89189 -31.10302,-31.13514 z"
        id="path6455"
        inkscape:connector-curvature="0"
