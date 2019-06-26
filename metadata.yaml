@@ -13,4 +13,4 @@ provides:
 peers:
   cluster:
     interface: arangodb
-series: ['xenial']
+series: ['bionic']

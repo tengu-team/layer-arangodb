@@ -53,7 +53,7 @@ def configure_interface(db):
 def change_configuration():
     status_set('maintenance', 'configuring ArangoDB')
     change_config()
-    service_restart('arangodb')
+    service_restart('arangodb3')
     status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
 
 ################################################################################
@@ -133,13 +133,13 @@ def install_standalone():
     require = "require('@arangodb/users').update('root', '{}', true)".format(kv.get('password'))
     subprocess.check_call(['arangosh', '--server.username', 'root', '--server.password', '', '--javascript.execute-string', require])
     open_port(conf['port'])
-    service_restart('arangodb')
+    service_restart('arangodb3')
     kv.set('cluster', False)
     status_set('active', 'ArangoDB running with root password {}'.format(kv.get('password')))
 
 
 def install_clustered():
-    service_stop('arangodb')
+    service_stop('arangodb3')
     if not is_flag_set('arangodb.clustered'):
         if unit_private_ip() == leader_get('master_ip'):
             render(source='arangodbcluster.service',
